@@ -170,3 +170,18 @@ foo.name;   // 'foo'
 function foo() {};
 foo.bind({}).name // "bound foo"
 (function(){}).bind({}).name // "bound "
+
+
+
+
+/**
+* 函数参数的尾逗号
+*/
+// ES2017 允许函数的最后一个参数有尾逗号
+// 这样的规定也使得，函数参数与数组和对象的尾逗号规则，保持一致了。
+function fn(
+  param1,
+  param2,
+) { /* ... */ }
+
+fn('foo','bar',);   // 正确
