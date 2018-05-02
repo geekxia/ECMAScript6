@@ -69,3 +69,104 @@ let obj2 = {
 obj2[s2](1);
 
 // Symbol 值作为属性名时，该属性还是公开属性，不是私有属性。
+
+
+
+/**
+* 消除魔术字符串
+*/
+// 魔术字符串指的是，在代码之中多次出现、与代码形成强耦合的某一个具体的字符串或者数值。风格良好的代码，应该尽量消除魔术字符串，改由含义清晰的变量代替。
+const shapeType = {
+    triangle: Symbol()
+}
+switch (type) {
+    case shapeType.triangle:
+        // ...
+        break;
+    default:
+        // ...
+}
+// 可以发现shapeType.triangle等于哪个值并不重要，只要确保不会跟其他shapeType属性的值冲突即可。因此，这里就很适合改用 Symbol 值。
+
+
+
+/**
+* Symbol属性名的遍历：Object.getOwnPropertySymbols()
+*/
+// Symbol 作为属性名，该属性不会出现在for...in、for...of循环中，也不会被Object.keys()、Object.getOwnPropertyNames()、JSON.stringify()返回。但是，它也不是私有属性，有一个Object.getOwnPropertySymbols方法，可以获取指定对象的所有 Symbol 属性名。
+const obj = {};
+let a = Symbol('a');
+let b = Symbol('b');
+obj[a] = 'hello';
+obj[b] = 'world';
+
+const symbolArr = Object.getOwnPropertySymbols(obj);
+symbolArr;  // [Symbol(a), Symbol(b)]
+
+
+
+/**
+* Reflect.ownKeys()
+*/
+// Reflect.ownKeys方法可以返回所有类型的键名，包括常规键名和 Symbol 键名。
+let obj = {
+    [Symbol('my_key')]: 1,
+    enum: 2,
+    nonEnum: 3
+}
+Reflect.ownKeys(obj);   // ['enum', 'nonEnum', Symbol(my_key)]
+
+
+
+/**
+* Symbol.for()
+* Symbol.keyFor()
+*/
+// Symbol.for()与Symbol()这两种写法，都会生成新的 Symbol。它们的区别是，前者会被登记在全局环境中供搜索，后者不会。Symbol.for()不会每次调用就返回一个新的 Symbol 类型的值，而是会先检查给定的key是否已经存在，如果不存在才会新建一个值。比如，如果你调用Symbol.for("cat")30 次，每次都会返回同一个 Symbol 值，但是调用Symbol("cat")30 次，会返回 30 个不同的 Symbol 值。
+
+Symbol.for('bar') === Symbol.for('bar');   // true
+Symbol('foo') === Symbol('foo');     // false
+
+// 由于Symbol()写法没有登记机制，所以每次调用都会返回一个不同的值。
+// Symbol.keyFor方法返回一个已登记的 Symbol 类型值的key。
+let s1 = Symbol.for('foo');
+Symbol.keyFor(s1);  // 'foo'
+
+let s2 = Symbol('bar');
+Symbol.keyFor(s2);  // undefined
+
+
+
+/**
+* 实例：模块的 Singleton 模式
+*/
+// Singleton 模式指的是调用一个类，任何时候返回的都是同一个实例。
+// 模块文件可以看成是一个类。怎么保证每次执行这个模块文件，返回的都是同一个实例呢？
+
+const FOO_KEY = Symbol('foo');
+function A() {
+    this.foo = 'hello';
+}
+if (!global[FOO_KEY]) {
+    global[FOO_KEY] = new A();  // 把模块实例赋值给全局变量
+}
+module.exports = global[FOO_KEY];
+
+
+
+/**
+* 内置的 Symbol 值
+*/
+/*
+    Symbol.hasInstance
+    Symbol.isConcatSpreadable
+    Symbol.species
+    Symbol.match
+    Symbol.replace
+    Symbol.search
+    Symbol.split
+    Symbol.iterator
+    Symbol.toPrimitive
+    Symbol.toStringTag
+    Symbol.unscopables
+*/
