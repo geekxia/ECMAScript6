@@ -65,7 +65,6 @@ for(let [key,value] of map.entries()) {
 /**
 * Map结构与其它结构进行相互转换
 */
-<<<<<<< HEAD
 /*
     Map 转成 数组
     数组 转成 Map
@@ -88,5 +87,3 @@ const k1 = [1, 2, 3];
 const k2 = [4, 5, 6];
 const wm = new WeakMap([[k1, 'foo'], [k2, 'bar']]);
 wm.get(k2) // "bar"
-=======
->>>>>>> 94ce146079cef87ff134dfabe10fd11e61cd92a3
