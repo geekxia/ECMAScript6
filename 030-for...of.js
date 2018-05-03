@@ -71,3 +71,59 @@ for (let pair of arr.entries()) {
 // [0, 'a']
 // [1, 'b']
 // [2, 'c']
+
+
+
+
+/**
+* for...of 遍历字符串
+*/
+let str = 'hello';
+
+for (let s of str) {
+    console.log(s);   // h  e  l  l  o
+}
+
+
+
+
+
+/**
+* for...of 遍历 NodeList对象
+*/
+let opArr = document.querySelectorAll('p');
+
+for(let p of opArr) {
+    p.classList.add('on');
+}
+
+
+
+
+/**
+* for...of 遍历 arguments对象
+*/
+function printArgs() {
+    for (let x of arguments) {
+        console.log(x);
+    }
+}
+printArgs('a', 'b');
+// 'a'
+// 'b'
+
+
+
+
+// 并不是所有类似数组的对象都具有 Iterator 接口，一个简便的解决方法，就是使用Array.from方法将其转为数组。
+let arrayLike = { length: 2, 0: 'a', 1: 'b' };
+
+// 报错
+for (let x of arrayLike) {
+  console.log(x);
+}
+
+// 正确
+for (let x of Array.from(arrayLike)) {
+  console.log(x);
+}
