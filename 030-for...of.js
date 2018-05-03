@@ -114,7 +114,9 @@ printArgs('a', 'b');
 
 
 
-
+/**
+* for...of 遍历 非 Iterator 的类数组对象
+*/
 // 并不是所有类似数组的对象都具有 Iterator 接口，一个简便的解决方法，就是使用Array.from方法将其转为数组。
 let arrayLike = { length: 2, 0: 'a', 1: 'b' };
 
@@ -126,4 +128,50 @@ for (let x of arrayLike) {
 // 正确
 for (let x of Array.from(arrayLike)) {
   console.log(x);
+}
+
+
+
+
+/**
+* for...of 遍历 对象
+*/
+// 对于普通的对象，for...of结构不能直接使用，会报错
+// 使用 for...in 可以遍历对象的键名
+let obj = {
+    a: 1,
+    b: 2,
+    c: 3
+}
+
+for (let e in obj) {
+    console.log(e);  // 'a'  'b'  'c'
+}
+// 总之，for...in循环主要是为遍历对象而设计的，不适用于遍历数组。
+
+// 一种解决方法是，使用Object.keys方法将对象的键名生成一个数组，然后再用 for...of 遍历这个数组。
+for(let key of Object.keys(obj)) {
+    console.log(key + ': ' + obj[key]);
+}
+
+// 另一个方法是使用 Generator 函数将对象重新包装一下。
+function* entries(obj) {
+    for(let key of Object.keys(obj)) {
+        yield [key, obj[key]];
+    }
+}
+for(let [key, value] of entries(obj)) {
+    console.log(key, '->', value);
+}
+
+
+
+/**
+* for...of 可以与 break / continue / return 配合使用
+*/
+for (var n of arr) {
+    if (n > 10) {
+        break;
+    }
+    console.log(n);
 }
