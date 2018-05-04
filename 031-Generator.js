@@ -88,3 +88,104 @@ function* gen() {
 var genIterator = gen();
 
 genIterator[Symbol.iterator]() === genIterator;  // true
+
+
+
+
+/**
+* next()
+*/
+// yield表达式本身没有返回值，或者说总是返回undefined。next方法可以带一个参数，该参数就会被当作上一个yield表达式的返回值。
+
+// 注意，由于next方法的参数表示上一个yield表达式的返回值，所以在第一次使用next方法时，传递参数是无效的。V8 引擎直接忽略第一次使用next方法时的参数，只有从第二次使用next方法开始，参数才是有效的。从语义上讲，第一个next方法用来启动遍历器对象，所以不用带有参数。
+
+
+
+
+/**
+* for...of 循环
+*/
+// for...of循环可以自动遍历 Generator 函数时生成的Iterator对象，且此时不再需要调用next方法。
+
+function* f() {
+    yield 1;
+    yield 2;
+    yield 3;
+    return 4;
+}
+for (let v of f()) {
+    console.log(v);   // 1  2  3
+}
+// 上面代码使用for...of循环，依次显示 3 个yield表达式的值。这里需要注意，一旦next方法的返回对象的done属性为true，for...of 循环就会中止，且不包含该返回对象，所以上面代码的return语句返回的4，不包括在for...of循环之中。
+
+
+// 示例：实现斐波那契数列
+function* fibonacci() {
+    let [prev, curr] = [0, 1];
+    for ( ; ; ) {
+        [prev, curr] = [curr, prev + curr];
+        yield curr;
+    }
+}
+
+for (let n of fibonacci()) {
+    if ( n > 1000) break;
+    console.log(n);
+}
+
+
+
+
+/**
+* 函数封装：给不具备 Iterator 接口的对象部署 Iterator 接口
+*/
+// 方案一：用 Generator函数，把对象转化成遍历器对象
+function* createIterator(obj) {
+    let propKeys = Reflect.ownKeys(obj);
+    for (let prop of propKeys) {
+        yield [prop, obj[prop]];
+    }
+}
+let testObj = { first: 1, last: 2 };
+for( let [k,v] of createIterator(testObj)) {
+    console.log(`${k}: ${v}`);
+}
+
+// 方案二：将 Generator 函数加到对象的Symbol.iterator属性上面
+function* createIterator() {
+    let propKeys = Object.keys(this);
+    for (let prop of propKeys) {
+        yield [prop, this[prop]];
+    }
+}
+let testObj = { first: 1, last: 2 };
+testObj[Symbol.iterator] = createIterator;
+for (let [k,v] of testObj) {
+    console.log(`${k}: ${v}`);
+}
+
+
+
+
+// 除了for...of循环以外，扩展运算符（...）、解构赋值和Array.from方法内部调用的，都是遍历器接口。这意味着，它们都可以将 Generator 函数返回的 Iterator 对象，作为参数。
+function* f() {
+    yield 1;
+    yield 2;
+    return 3;
+    yield 4;
+}
+// 扩展运算符
+[...f()];  // [1,2]
+
+// Array.from()
+Array.from(f());  // [1,2]
+
+// 解构赋值
+let [x, y] = f();
+x;  // 1
+y;  // 2
+
+// for...of 循环
+for (let n of f()) {
+    console.log(n);  // 1  2
+}
