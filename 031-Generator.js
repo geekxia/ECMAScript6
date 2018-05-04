@@ -189,3 +189,30 @@ y;  // 2
 for (let n of f()) {
     console.log(n);  // 1  2
 }
+
+
+
+
+/**
+* Generator函数返回值 的相关 API
+*/
+/*
+    Generator.prototype.throw()
+    Generator.prototype.return()
+*/
+function* f() {
+    yield 1;
+}
+var it = f();   // 生成遍历器对象
+it.throw('err');
+it.return('ending');
+
+
+
+/**
+* next()、throw()、return() 的共同点
+*/
+// next()、throw()、return()这三个方法本质上是同一件事，可以放在一起理解。它们的作用都是让 Generator 函数恢复执行，并且使用不同的语句替换yield表达式。
+next() 是将yield表达式替换成一个值。
+throw() 是将yield表达式替换成一个throw语句。
+return() 是将yield表达式替换成一个return语句。
