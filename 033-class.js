@@ -352,3 +352,37 @@ class Doo extends Foo {
 /**
 *   class中 的静态属性和实例属性
 */
+// 静态属性指的是 Class 本身的属性，即Class.propName，而不是定义在实例对象（this）上的属性。
+class Foo {
+    constructor() {
+        this.prop = 0;  // 实例属性
+    }
+};
+Foo.prop = 1;   // 类的静态属性
+
+// 类的静态属性只有上述这种写法，因为 ES6 明确规定，Class 内部只有静态方法，没有静态属性。
+
+// 实例属性，只能写在类的constructor方法里面。
+
+
+
+/**
+*   new.target
+*/
+// 在 Class 内部调用new.target，返回当前 Class。
+// 子类继承父类时，new.target会返回子类。
+class Foo {
+    constructor() {
+        console.log(new.target === Foo);  // true
+    }
+}
+
+// 在构造函数之中，new命令作用于的那个构造函数。如果构造函数不是通过new命令调用的，new.target会返回undefined
+function Person() {
+    if (new.target === Person) {
+        console.log('使用了 new 创建实例');
+    }
+    if (new.target === undefined) {
+        console.log('未使用 new 创建实例');
+    }
+}
