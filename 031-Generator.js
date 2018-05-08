@@ -194,7 +194,11 @@ for (let n of f()) {
 
 
 /**
+<<<<<<< HEAD
 * Generator函数返回值 的相关 API
+=======
+* Generator相关 API
+>>>>>>> 0f4b3d69be8561ff0b204bd6df58eb31eec46ca6
 */
 /*
     Generator.prototype.throw()
@@ -204,8 +208,14 @@ function* f() {
     yield 1;
 }
 var it = f();   // 生成遍历器对象
+<<<<<<< HEAD
 it.throw('err');
 it.return('ending');
+=======
+f.throw('err');
+f.return('ending');
+
+>>>>>>> 0f4b3d69be8561ff0b204bd6df58eb31eec46ca6
 
 
 
@@ -213,6 +223,208 @@ it.return('ending');
 * next()、throw()、return() 的共同点
 */
 // next()、throw()、return()这三个方法本质上是同一件事，可以放在一起理解。它们的作用都是让 Generator 函数恢复执行，并且使用不同的语句替换yield表达式。
+<<<<<<< HEAD
 next() 是将yield表达式替换成一个值。
 throw() 是将yield表达式替换成一个throw语句。
 return() 是将yield表达式替换成一个return语句。
+=======
+
+next()是将yield表达式替换成一个值。
+throw()是将yield表达式替换成一个throw语句。
+return()是将yield表达式替换成一个return语句。
+
+
+
+
+/**
+*    yield*  表达式
+*/
+// 默认情况下，在一个 Generator 函数内部调用另一个 Generator 函数是没有效果的。
+
+// 使用 yield* 表达式，可以实现在一个Generator 函数内部调用另一个Generator 函数。
+function* f1() {
+    yield 1;
+    yield 2;
+}
+function* f2() {
+    yield 3;
+    yield* f1();
+    yield 4;
+}
+// 等同于
+function* f3() {
+    yield 3;
+    yield 1;
+    yield 2;
+    yield 4;
+}
+// 等同于
+function* f4() {
+    yield 3;
+    for (let v of f1()) {
+        yield v;
+    }
+    yield 4;
+}
+// yield* 后面的 Generator 函数（没有return语句时），等同于在 Generator 函数内部，部署一个for...of循环。
+
+// 实际上，任何数据结构只要有 Iterator 接口，就可以被yield*遍历。
+let read = (function* () {
+    yield 'hello';
+    yield* 'hello';
+})();
+read.next().value;   // 'hello'
+read.next().value;   // 'h'
+read.next().value;   // 'e'
+
+
+// yield* 表达式可以很方便地遍历出多维数组的所有成员。
+// 函数封装：用于遍历多维数组
+function* iterTree(tree) {
+    if (Array.isArray(tree)) {
+        for (let i = 0; i < tree.length; i++) {
+            yield* iterTree(tree[i]);
+        }
+    } else {
+        yield tree;
+    }
+};
+
+const arr = [1, 2, [3, 4, [5, 6]], 7, 8];  // 三维数组
+for (let x of iterTree(arr)) {
+    console.log(x);  // 1  2  3  4  5  6  7  8
+}
+
+
+
+/**
+* 示例：yield* 表达式遍历完全二叉树
+*/
+// 二叉树构造函数，三个参数分别是左树、当前节点和右树
+function Tree(left, label, right) {
+    this.left = left;
+    this.label = label;
+    this.right = right;
+}
+// 生成二叉树
+function makeTree(arr) {
+    // 判断是否是叶节点
+    if (arr.length == 1) return new Tree(null, arr[0], null);
+    return new Tree(makeTree(arr[0]), arr[1], makeTree(arr[2]));
+}
+// 定义二叉树的遍历函数
+function* inorder(t) {
+    if(t) {
+        yield* inorder(t.left);
+        yield t.label;
+        yield* inorder(t.right);
+    }
+}
+// 测试
+let tree = makeTree([[['a'], 'b', ['c']], 'd', [['e'], 'f', ['g']]]);
+var res = [];
+for (let node of inorder(tree)) {
+    res.push(node);
+}
+
+
+
+
+
+/**
+*  作为对象属性的 Generator 函数
+*/
+let obj = {
+    * f() {
+        yield 1;
+    }
+}
+// 或者
+let obj = {
+    f: function* () {
+        yield 1;
+    }
+}
+
+
+
+
+
+/**
+* Generator 函数的 this
+*/
+// Generator 函数总是返回一个遍历器，ES6 规定这个遍历器是 Generator 函数的实例，也继承了 Generator 函数的prototype对象上的方法。
+
+function* G() {
+    this.a = 1;
+};
+G.prototype.hello = function() {
+    return 'hi';
+}
+let g = G();   // 生成遍历器对象
+g instanceof G;   // true
+g.hello();     // 'hi'
+g.a;    //  undefined
+
+// 调用 Generator函数，返回的是遍历器对象，这个遍历器对象是 Generator函数的实例，而不是 this实例。Generator 函数也不能跟new命令一起用，会报错。
+
+
+// 那么，有没有办法让 Generator 函数返回一个正常的对象实例，既可以用next方法，又可以获得正常的this？
+
+// 方案一
+function* F() {
+  this.a = 1;
+  yield this.b = 2;
+  yield this.c = 3;
+}
+var f = F.call(F.prototype);
+
+f.next();  // Object {value: 2, done: false}
+f.next();  // Object {value: 3, done: false}
+f.next();  // Object {value: undefined, done: true}
+
+f.a // 1
+f.b // 2
+f.c // 3
+
+// 方案二
+function* gen() {
+    this.a = 1;
+    yield this.b = 2;
+    yield this.c = 3;
+}
+function F() {
+    return gen.call(gen.prototype);
+}
+var f = new F();
+
+f.next();  // Object {value: 2, done: false}
+f.next();  // Object {value: 3, done: false}
+f.next();  // Object {value: undefined, done: true}
+
+f.a // 1
+f.b // 2
+f.c // 3
+
+
+
+
+
+
+/**
+*  Generator 函数的异步应用
+*/
+/*
+S6 诞生以前，异步编程的方法，大概有下面四种：
+    回调函数
+    事件监听
+    发布/订阅
+    Promise 对象
+Generator 函数将 JavaScript 异步编程带入了一个全新的阶段。
+*/
+
+// 异步的概念
+// 所谓"异步"，简单说就是一个任务不是连续完成的，可以理解成该任务被人为分成两段，先执行第一段，然后转而执行其他任务，等做好了准备，再回过头执行第二段。这种不连续的执行，就叫做异步。
+
+// 相应地，连续的执行就叫做同步。由于是连续执行，不能插入其他任务，所以操作系统从硬盘读取文件的这段时间，程序只能干等着。
+>>>>>>> 0f4b3d69be8561ff0b204bd6df58eb31eec46ca6
