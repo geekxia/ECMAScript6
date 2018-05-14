@@ -158,3 +158,113 @@ import { foo, bar } from 'module';
 /**
 *   export default 命令
 */
+// 本质上，export default就是输出一个叫做default的变量或方法，然后系统允许你为它取任意名字。
+// 一个模块中只能有一个默认输出，因此export default命令只能使用一次。
+export default function() {};
+export default function foo() {};
+export default a;
+export default 45;
+export default class MyClass {};
+// export default命令其实只是输出一个叫做default的变量，所以它后面不能跟变量声明语句。
+export default var a = 1;   // 报错
+// 导入 default 接口
+import xxx from './my_default.js';
+
+// 注意：
+// 一个模块中，使用 export default 导出的接口，import 时无须大括号。直接用 export 导出的接口，import 时，都需要用大括号包裹起来。
+export a;
+export b;
+export default c;
+
+import c, { a, b} from './my_default.js';  // 注意大括号的使用
+
+
+
+/**
+*   export 与 import 的复合写法
+*/
+// 如果在一个模块之中，先输入后输出同一个模块，import语句可以与export语句写在一起。写成一行以后，被导入再导出的接口 API，实际上并没有被导入当前模块，只是相当于对外转发了这些接口，导致当前模块不能直接使用这些接口。
+
+export { foo, bar } from 'my_module';
+// 等同于
+import { foo, bar } from 'my_module';
+export { foo, bar };
+
+// 这种写法，可以用于对模块接口进行改名和整体输出
+// 接口改名
+export { foo as myFoo } from 'my_module';
+// 整体导出
+export * from 'my_module';
+
+// 导出默认接口
+export { default } from 'my_module';
+export { es6 as default } from 'my_module';
+export { default as es6 } from 'my_module';
+
+
+
+/**
+*   模块的继承
+*/
+// 模块之间也可以继承。
+export * from 'circle';
+export var e = 2.718;
+export default function(x) {
+    return Math.exp(x);
+}
+// 注意，export *命令会忽略circle模块的default方法。然后，上面代码又输出了自定义的e变量和默认方法。
+
+
+
+/**
+*   跨模块常量
+*/
+// const声明的常量只在当前代码块有效。如果想设置跨模块的常量（即跨多个文件），或者说一个值要被多个模块共享，可以采用下面的写法。
+
+// constants.js模块
+export const A = 1;
+export const B = 2;
+export const C = 2;
+
+// 使用这些跨模块的常量
+import * as constants from './constants.js';
+console.log(constants.A);
+// 另一种使用方式
+import { A, B } from './constants.js';
+console.log(B);
+
+
+// 如果要使用的常量非常多，可以建立一个常量目录，把这些常量分模块进行定义，再统一导出。做法如下：
+// constants/db.js
+export const db = {
+    url: 'http://my.local:8000',
+    admin: 'root',
+    pwd: '123456'
+};
+// constants/user.js
+export const users = ['root', 'admin', 'staff', 'ceo'];
+
+// 合并常量，统一导出
+// constants/index.js
+export { db } from './db.js';
+export { users } from './users.js';
+
+// 使用这些常量
+import { db, users } from './index.js';
+
+
+
+
+/**
+*   import()
+*/
+// import命令会被 JavaScript 引擎静态分析，先于模块内的其他语句执行。也就是说，import和export命令只能在模块的顶层，不能在代码块之中。
+
+// 这样的设计，固然有利于编译器提高效率，但也导致无法在运行时加载模块。在语法上，条件加载就不可能实现。如果import命令要取代 Node 的require方法，这就形成了一个障碍。因为require是运行时加载模块，import命令无法取代require的动态加载功能。
+
+// 提案：建议引入 import()，实现动态加载功能。像node.js的require()一样
+const path = './' + fileName;
+let myModule = null;
+if (bol) {
+    myModule = require(path);
+}
