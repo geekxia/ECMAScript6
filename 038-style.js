@@ -76,3 +76,111 @@ const copy = [...arr];
 // 10、使用 Array.from 方法，将类似数组的对象转为数组。
 const foo = document.querySelectorAll('div');
 const nodes = Array.from(foo);
+
+
+// 11、立即执行函数可以写成箭头函数的形式。
+(() => {
+    console.log('geek');
+})();
+
+
+// 12、箭头函数取代Function.prototype.bind，不应再用 self/_this/that 绑定 this。
+const boundMethod (...params) => method.apply(this, params);
+[1,2,3].map((x) => x * x);
+
+
+// 13、所有配置项都应该集中在一个对象，放在最后一个参数，布尔值不可以直接作为参数。
+function divide(a, b, { option = false } = {}) {};
+
+
+// 14、不要在函数体内使用 arguments 变量，使用 rest 运算符（...）代替。因为 rest 运算符显式表明你想要获取参数，而且 arguments 是一个类似数组的对象，而 rest 运算符可以提供一个真正的数组。
+function concatAll(...args) {
+    return args.join('-');
+}
+
+
+// 15、使用默认值语法设置函数参数的默认值。
+function handleThings (opts = {}) {};
+
+
+// 16、注意区分 Object 和 Map，只有模拟现实世界的实体对象时，才使用 Object。如果只是需要key: value的数据结构，使用 Map 结构。因为 Map 有内建的遍历机制。
+let map = new Map(arr);
+for (let key of map.keys()) {};
+for (let value of map.values()) {};
+for (let item of map.entries()) {};
+
+
+// 17、用 Class，取代需要 prototype 的操作。因为 Class 的写法更简洁，更易于理解。
+class Queue {
+    constructor(contents = []) {
+        this._queue = [...contents];
+    }
+    pop() {
+        const value = this._queue[0];
+        this._queue.splice(0, 1);
+        return value;
+    }
+}
+
+
+// 18、使用extends实现继承，因为这样更简单，不会有破坏instanceof运算的危险。
+class PeekableQueue extends Queue {
+    peek() {
+        return this._queue[0];
+    }
+}
+
+
+// 19、Module 语法是 JavaScript 模块的标准写法，优先使用ES6模块写法。用 import取代 require。
+import { fn1, fn2 } from 'my_module';
+
+
+// 20、用 export取代 module.exports
+import React from 'react';
+class Breadcrumbs exports React.Component {
+    render() {}
+}
+export default Breadcrumbs;
+
+
+// 21、如果模块只有一个输出值，就使用export default。如果模块有多个输出值，就不使用export default，export default与普通的export不要同时使用。
+
+
+// 22、不要在模块输入中使用通配符。因为这样可以确保你的模块之中，有一个默认输出（export default）。
+// bad
+import * as myObj from 'my_module';  // 不建议这么写
+// good
+import myObj from 'my_module';
+
+
+// 23、如果模块默认输出一个函数，函数名的首字母应该小写
+function makeStyle() {};
+export default makeStyle;
+
+
+// 24、如果模块默认输出一个对象，对象名的首字母应该大写。
+const StyleGuide = {};
+export default StyleGuide;
+
+
+/**
+*   ESLint
+*/
+// ESLint 是一个语法规则和代码风格的检查工具，可以用来保证写出语法正确、风格统一的代码。
+
+// 安装
+npm install eslint -g
+
+// 安装 Airbnb 语法规则，以及 import、a11y、react 插件
+npm install eslint-config-airbnb -g
+npm install eslint-plugin-import -g
+npm install eslint-plugin-jsx-ally -g
+npm install eslint-plugin-react -g
+
+// 配置 .eslintrc文件
+{
+    "extends": "eslint-config-airbnb"
+}
+
+// 检测文件编码是否合乎规范
+eslint index.js
